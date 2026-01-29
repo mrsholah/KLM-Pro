@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, minimum-scale=1.0,
+               user-scalable=no">
+
+<title>KLM Pro– Kajian Lesehan Milenial</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html, body{height:100%; overflow:hidden;}
+body{
+    font-family:Poppins,sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+    min-height:100vh;
+    transition:.4s;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start; 
+    align-items:center;
+    padding-top:80px;
+}
+
+/* ===== HAMBURGER ===== */
+.hamburger{
+    position:fixed;top:18px;left:18px;
+    font-size:1.8rem;
+    background:rgba(0,0,0,.4);
+    backdrop-filter:blur(10px);
+    padding:10px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    z-index:30;
+    color:#fff;
+}
+
+/* ===== MENU ===== */
+.menu{
+    position:fixed;top:0;left:-260px;
+    width:240px;height:100%;
+    background:rgba(0,0,0,.6);
+    backdrop-filter:blur(16px);
+    padding:80px 20px;
+    transition:.4s;
+    z-index:25;
+}
+.menu a{
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    margin-bottom:20px;
+    font-size:1.1rem;
+}
+.menu.active{left:0}
+
+.overlay{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.4);
+    display:none;
+    z-index:20;
+}
+.overlay.show{display:block}
+
+/* ===== THEME SWITCH ===== */
+.theme-box{position:fixed;top:22px;right:18px;z-index:30}
+.switch{
+    width:56px;height:30px;
+    background:#333;
+    border-radius:50px;
+    position:relative;
+    cursor:pointer;
+}
+.knob{
+    width:26px;height:26px;
+    background:#fff;
+    border-radius:50%;
+    position:absolute;
+    top:2px;left:2px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.4s;
+}
+.switch.active{background:#00ffd5}
+.switch.active .knob{transform:translateX(26px)}
+
+/* ===== HERO ===== */
+.hero{text-align:center;margin-top:0}
+.hero h1{font-size:3rem}
+.hero p{opacity:.85; margin-top:4px;}
+
+/* ===== CLOCK ===== */
+.clock-box{text-align:center;margin-top:12px;margin-bottom:16px}
+#clock{
+    font-size:4.2rem;
+    font-weight:700;
+    color:#black;
+    text-shadow:0 0 25px rgba(0,255,213,.8);
+}
+#date{margin-top:4px;font-size:1rem}
+
+/* ===== GRID ===== */
+.grid-wrapper{
+    display:flex;
+    justify-content:center;
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+    max-width:520px;
+    width:100%;
+    padding:0 16px;
+}
+.card{
+    background:rgba(255,255,255,.1);
+    backdrop-filter:blur(14px);
+    border-radius:22px;
+    padding:20px 16px;
+    text-align:center;
+    cursor:pointer;
+    transition:.4s;
+}
+.card:hover{
+    transform:translateY(-6px) scale(1.04);
+    box-shadow:0 0 25px rgba(0,255,213,.3);
+}
+.card span{font-size:3rem}
+.card h3{margin-top:8px;font-weight:500}
+
+/* ===== LIGHT MODE ===== */
+body.light{
+    background:#f4f4f4;
+    color:#111;
+}
+body.light .card,
+body.light .hamburger{
+    background:#fff;
+    color:#111;
+}
+body.light .hamburger{color:#111}
+body.light .menu{color:f4f4f4;}
+
+/* ===== PARTICLE ===== */
+#particle{position:fixed;inset:0;z-index:-1}
+</style>
+</head>
+
+<body>
+
+<div class="hamburger" onclick="openMenu()">☰</div>
+
+<div class="menu" id="menu">
+    <a href="#">Beranda</a>
+    <a href="#">Agenda</a>
+    <a href="#">Tentang</a>
+    <a href="#">Kontak</a>
+</div>
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<div class="theme-box">
+    <div class="switch" id="themeSwitch" onclick="toggleTheme()">
+        <div class="knob" id="themeIcon">🌙</div>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>KLM Pro</h1>
+    <h3>Aplikasi Digital Untuk Kalangan Lesehan Milenial</h3>
+</div>
+
+<div class="clock-box">
+    <div id="clock"></div>
+    <div id="date"></div>
+</div>
+
+<div class="grid-wrapper">
+<div class="grid">
+    <!-- Kitab Kajian & Al-Qur'an di atas -->
+    <div class="card" onclick="window.open('https://drive.google.com','_blank')">
+        <span>📚</span><h3>Kitab Kajian</h3>
+    </div>
+    <div class="card" onclick="location.href='quran.html'">
+        <span>📖</span><h3>Al-Qur'an</h3>
+    </div>
+    <!-- Lainnya di bawah -->
+    <div class="card" onclick="location.href='kalender.html'">
+        <span>📅</span><h3>Kalender</h3>
+    </div>
+    <div class="card" onclick="location.href='sholat.html'">
+        <span>🕌</span><h3>Jadwal Sholat</h3>
+    </div>
+</div>
+</div>
+
+<canvas id="particle"></canvas>
+
+<script>
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+const themeSwitch = document.getElementById("themeSwitch");
+const themeIcon = document.getElementById("themeIcon");
+const clock = document.getElementById("clock");
+const date = document.getElementById("date");
+
+/* ===== MENU ===== */
+function openMenu(){menu.classList.add("active");overlay.classList.add("show");}
+function closeMenu(){menu.classList.remove("active");overlay.classList.remove("show");}
+
+/* ===== THEME ===== */
+function toggleTheme(){
+    const isLight=document.body.classList.toggle("light");
+    themeSwitch.classList.toggle("active",isLight);
+    themeIcon.textContent=isLight?"☀️":"🌙";
+    localStorage.setItem("theme",isLight?"light":"dark");
+}
+if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light");
+    themeSwitch.classList.add("active");
+    themeIcon.textContent="☀️";
+}
+
+/* ===== CLOCK ===== */
+setInterval(()=>{
+    const n=new Date();
+    clock.textContent=n.toLocaleTimeString("id-ID",{hour12:false});
+    date.textContent=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+},1000);
+
+/* ===== PARTICLE ===== */
+const c=particle,x=c.getContext("2d");
+c.width=innerWidth;c.height=innerHeight;
+let p=[...Array(80)].map(()=>({
+    x:Math.random()*c.width,
+    y:Math.random()*c.height,
+    dx:Math.random()-.5,
+    dy:Math.random()-.5,
+    s:Math.random()*2+1
+}));
+(function anim(){
+    x.clearRect(0,0,c.width,c.height);
+    p.forEach(o=>{
+        o.x+=o.dx;o.y+=o.dy;
+        if(o.x<0||o.x>c.width)o.dx*=-1;
+        if(o.y<0||o.y>c.height)o.dy*=-1;
+        x.fillStyle="rgba(0,255,213,.7)";
+        x.beginPath();
+        x.arc(o.x,o.y,o.s,0,Math.PI*2);
+        x.fill();
+    });
+    requestAnimationFrame(anim);
+})();
+
+/* ===== DISABLE ZOOM ===== */
+document.addEventListener("wheel",e=>{if(e.ctrlKey)e.preventDefault();},{passive:false});
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&["=","-","+","0"].includes(e.key)) e.preventDefault();});
+
+/* ===== ESCAPE LANGSUNG KELUAR HALAMAN AWAL ===== */
+document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+        window.close(); // langsung keluar tanpa prompt
+    }
+});
+</script>
+
+</body>
+</html>

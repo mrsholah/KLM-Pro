@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al-Qur'an KLM</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Poppins,sans-serif;background:#0f2027;color:#fff}
+body.light{background:#f4f4f4;color:#111}
+
+/* HEADER */
+.header{
+    height:64px;display:flex;justify-content:space-around;align-items:center;
+    background:rgba(0,0,0,.55)
+}
+body.light .header{background:#fff}
+.tab{padding:6px 16px;border-radius:20px;font-weight:600;cursor:pointer}
+.tab.active{background:#00ffd5;color:#000}
+
+/* SEARCH & LIST */
+.search{padding:14px}
+.search input{width:100%;padding:10px 14px;border-radius:12px;border:none}
+.list{padding:14px}
+.card{
+    padding:14px;background:rgba(255,255,255,.08);
+    border-radius:14px;margin-bottom:12px;cursor:pointer
+}
+body.light .card{background:#fff}
+
+/* VIEWER */
+.viewer{display:none;padding-top:70px}
+.viewer-header{
+    position:fixed;top:0;left:0;width:100%;height:56px;
+    background:rgba(0,0,0,.7);
+    display:flex;align-items:center;justify-content:center;
+    z-index:20
+}
+body.light .viewer-header{background:#fff}
+.back-btn{position:absolute;left:14px;font-size:1.4rem;cursor:pointer}
+.hamburger{position:absolute;right:14px;font-size:1.7rem;cursor:pointer}
+
+/* CONTENT */
+.content{padding:18px}
+.bismillah{text-align:center;font-size:2rem;margin:20px 0 30px;opacity:.85}
+.ayat{margin-bottom:34px;position:relative;padding-left:10px}
+.ayat-num{position:absolute;left:0;top:0;font-size:.75rem;opacity:.6}
+.arab{text-align:right;font-size:2rem;line-height:2.8rem}
+.arti{display:none;font-size:.9rem;opacity:.85;margin-top:6px}
+.show-translation .arti{display:block}
+
+/* ACTIVE AYAT */
+.active-ayat{
+    background:rgba(0,255,213,.12);
+    border-left:4px solid #00ffd5;
+    border-radius:10px;
+    padding:12px 10px
+}
+body.light .active-ayat{
+    background:rgba(0,160,140,.15);
+    border-left:4px solid #00a08c
+}
+
+/* OVERLAY */
+.overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.45);
+    display:none;z-index:30
+}
+
+/* DRAWER */
+.drawer{
+    position:fixed;top:0;right:-80%;
+    width:75%;height:100vh;
+    background:#1e1e1e;
+    z-index:40;padding:18px;
+    transition:.3s;display:flex;flex-direction:column
+}
+.drawer.show{right:0}
+body.light .drawer{background:#f0f0f0}
+.drawer-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px;background:rgba(255,255,255,.08);
+    border-radius:12px;margin-bottom:14px
+}
+body.light .drawer-row{background:#fff}
+
+/* SWITCH */
+.switch{width:42px;height:22px;position:relative}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:#777;border-radius:22px}
+.slider:before{
+    content:"";width:18px;height:18px;background:#fff;border-radius:50%;
+    position:absolute;top:2px;left:2px;transition:.2s
+}
+input:checked + .slider{background:#00ffd5}
+input:checked + .slider:before{transform:translateX(20px)}
+
+/* BOOKMARK */
+.bookmark-card{
+    margin-top:auto;padding:16px;
+    background:#ffb703;color:#000;
+    border-radius:16px;text-align:center;
+    font-weight:600;cursor:pointer
+}
+
+/* AUDIO */
+.audio-popup{
+    position:fixed;bottom:14px;left:50%;
+    transform:translateX(-50%);
+    width:92%;max-width:420px;
+    background:#222;padding:14px;border-radius:16px;
+    z-index:60;display:none
+}
+body.light .audio-popup{background:#fff;color:#000}
+.audio-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.audio-btn{font-size:1.4rem;cursor:pointer}
+.audio-popup input{width:100%}
+.time{font-size:.75rem;opacity:.7;text-align:right}
+</style>
+</head>
+
+<body>
+
+<div class="header" id="mainHeader">
+    <div class="tab active">Surah</div>
+    <div class="tab" onclick="openBookmark()">Bookmark</div>
+</div>
+
+<div class="search" id="search">
+    <input type="text" placeholder="Cari surah..." oninput="filterSurah(this.value)">
+</div>
+<div class="list" id="list"></div>
+
+<div class="viewer" id="viewer">
+    <div class="viewer-header">
+        <div class="back-btn" onclick="history.back()">←</div>
+        <div id="viewerTitle"></div>
+        <div class="hamburger" onclick="openDrawer()">☰</div>
+    </div>
+    <div class="content" id="content"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="history.back()"></div>
+
+<div class="drawer" id="drawer">
+    <div class="drawer-row">
+        <span>Tampilkan Terjemah</span>
+        <label class="switch">
+            <input type="checkbox" id="toggleTrans">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="drawer-row" onclick="openAudio()">
+        <span>Putar Audio Surah</span><span>🎧</span>
+    </div>
+    <div class="bookmark-card" onclick="saveBookmark()">🔖 Tandai Bacaan</div>
+</div>
+
+<div class="audio-popup" id="audioPopup">
+    <div class="audio-controls">
+        <i class="fa-solid fa-play audio-btn" id="playBtn" onclick="togglePlay()"></i>
+        <i class="fa-solid fa-stop audio-btn" onclick="stopAudio()"></i>
+        <i class="fa-solid fa-xmark audio-btn" onclick="closeAudio()"></i>
+    </div>
+    <input type="range" id="seek" min="0">
+    <div class="time" id="time">00:00</div>
+</div>
+
+<script>
+if(localStorage.getItem("theme")==="light")document.body.classList.add("light");
+
+let surahList=[],currentSurah=null,lastAyat=1,audio=null;
+
+/* LOAD SURAH */
+fetch("https://api.quran.gading.dev/surah")
+.then(r=>r.json())
+.then(d=>{surahList=d.data;renderSurah(d.data)})
+
+function renderSurah(d){
+    list.innerHTML=d.map(s=>`
+        <div class="card" onclick="openSurah(${s.number})">
+            ${s.number}. ${s.name.transliteration.id}
+        </div>`).join("")
+}
+function filterSurah(q){
+    renderSurah(surahList.filter(s=>s.name.transliteration.id.toLowerCase().includes(q.toLowerCase())))
+}
+
+/* HISTORY */
+function pushState(p){history.pushState({page:p},"")}
+
+/* OPEN SURAH */
+function openSurah(no,ayat=null){
+    pushState("viewer");
+    currentSurah=no;
+    mainHeader.style.display="none";
+    search.style.display="none";
+    list.style.display="none";
+    viewer.style.display="block";
+
+    fetch(`https://api.quran.gading.dev/surah/${no}`)
+    .then(r=>r.json())
+    .then(d=>{
+        viewerTitle.innerText=`${d.data.name.transliteration.id} • Juz ${d.data.verses[0].meta.juz}`;
+
+        let b=no!==1 && no!==9?`<div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>`:"";
+        content.innerHTML=b+d.data.verses.map(v=>`
+            <div class="ayat" id="ayat-${v.number.inSurah}">
+                <div class="ayat-num">${v.number.inSurah}</div>
+                <div class="arab">${v.text.arab}</div>
+                <div class="arti">${v.translation.id}</div>
+            </div>`).join("");
+
+        applyTranslation();
+
+        if(ayat){
+            setTimeout(()=>{
+                highlightAyat(ayat);
+                document.getElementById("ayat-"+ayat)?.scrollIntoView({behavior:"smooth",block:"center"});
+            },300);
+        }
+    })
+}
+
+/* AUTO HIGHLIGHT */
+document.addEventListener("scroll",()=>{
+    if(viewer.style.display!=="block")return;
+    document.querySelectorAll(".ayat").forEach(a=>{
+        let r=a.getBoundingClientRect();
+        if(r.top>=0&&r.top<150){
+            lastAyat=a.id.split("-")[1];
+            highlightAyat(lastAyat);
+        }
+    })
+})
+function highlightAyat(n){
+    document.querySelectorAll(".ayat").forEach(a=>a.classList.remove("active-ayat"));
+    document.getElementById("ayat-"+n)?.classList.add("active-ayat");
+}
+
+/* DRAWER */
+function openDrawer(){drawer.classList.add("show");overlay.style.display="block";pushState("drawer")}
+function closeDrawer(){drawer.classList.remove("show");overlay.style.display="none"}
+
+/* TRANSLATION */
+toggleTrans.checked=localStorage.getItem("showTrans")==="1";
+toggleTrans.onchange=()=>{localStorage.setItem("showTrans",toggleTrans.checked?"1":"0");applyTranslation()}
+function applyTranslation(){
+    content.classList.toggle("show-translation",localStorage.getItem("showTrans")==="1")
+}
+
+/* AUDIO */
+function openAudio(){
+    closeDrawer();
+    if(audio)audio.pause();
+    audio=new Audio(`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${currentSurah}.mp3`);
+    audioPopup.style.display="block";
+    audio.play();
+    audio.ontimeupdate=()=>{
+        seek.max=audio.duration||0;
+        seek.value=audio.currentTime||0;
+        time.innerText=Math.floor(audio.currentTime/60)+":"+String(Math.floor(audio.currentTime%60)).padStart(2,"0");
+    }
+}
+seek.oninput=()=>audio.currentTime=seek.value;
+function togglePlay(){
+    if(audio.paused){audio.play();playBtn.className="fa-solid fa-pause audio-btn"}
+    else{audio.pause();playBtn.className="fa-solid fa-play audio-btn"}
+}
+function stopAudio(){audio.pause();audio.currentTime=0}
+function closeAudio(){audio.pause();audioPopup.style.display="none"}
+
+/* BOOKMARK */
+function saveBookmark(){
+    localStorage.setItem("lastRead",JSON.stringify({surah:currentSurah,ayat:lastAyat}));
+    alert("Bookmark disimpan");
+}
+function openBookmark(){
+    let b=JSON.parse(localStorage.getItem("lastRead"));
+    if(b)openSurah(b.surah,b.ayat);
+}
+
+/* BACK BUTTON HP */
+window.onpopstate=()=>{
+    if(drawer.classList.contains("show")){closeDrawer();return}
+    if(viewer.style.display==="block"){
+        viewer.style.display="none";
+        mainHeader.style.display="flex";
+        search.style.display="block";
+        list.style.display="block";
+        return;
+    }
+    location.href="index.html";
+}
+</script>
+
+</body>
+</html>

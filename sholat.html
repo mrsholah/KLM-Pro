@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KLM – Jadwal Sholat</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+html, body{height:100%;margin:0;padding:0;}
+body{
+    font-family:Poppins,sans-serif;
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    transition:.4s;
+    overflow:hidden;
+}
+body.light{
+    background:#f4f4f4;
+    color:#111;
+}
+
+/* ===== HERO ===== */
+.hero{text-align:center;margin:0;}
+h1{
+    font-size:3rem;
+    margin-bottom:4px;
+    animation: pulse 2s infinite alternate;
+}
+p{opacity:.8;margin:0 0 6px 0;}
+
+/* ===== JAM & COUNTDOWN ===== */
+.clock-box{text-align:center; margin-bottom:6px;}
+#clock{
+    font-size:3rem;
+    color:#00ffd5;
+    text-shadow:0 0 15px rgba(0,255,213,.8);
+    animation: glow 1.5s infinite alternate;
+}
+body.light #clock{color:#111;text-shadow:none;}
+#date{margin:2px 0 2px 0;font-size:0.95rem;}
+#countdown{
+    margin-top:4px;
+    font-size:1rem;
+    color:#00ffd5;
+    text-shadow:0 0 10px rgba(0,255,213,.8);
+}
+body.light #countdown{color:#111;text-shadow:none;}
+
+/* ===== TABLE ===== */
+table{
+    width:90%;
+    max-width:400px;
+    border-collapse:collapse;
+    border-radius:12px;
+    overflow:hidden;
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(12px);
+}
+body.light table{background:#fff;color:#111;}
+th,td{padding:4px 0;text-align:center;border-bottom:1px solid rgba(255,255,255,0.2);}
+body.light th, body.light td{border-color:#ccc;}
+th{background:rgba(0,255,213,.3);}
+body.light th{background:#ddd;}
+td.next{background:rgba(0,255,213,.2);font-weight:700;}
+
+/* ===== BUTTON ===== */
+button{
+    padding:8px 16px;
+    border:none;
+    border-radius:12px;
+    background:#00ffd5;
+    color:#000;
+    font-weight:700;
+    cursor:pointer;
+    margin:6px 0;
+    font-size:0.9rem;
+    width:70%;
+    max-width:220px;
+    text-align:center;
+    transition:.2s;
+    box-shadow:none; /* hilangkan neon */
+}
+button:hover{transform:scale(1.05);}
+
+/* ===== FLEX CONTAINER ===== */
+.main-container{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    padding:5px 0;
+}
+
+/* ===== ANIMASI ===== */
+@keyframes pulse{
+    0%{transform: scale(1);}
+    50%{transform: scale(1.05);}
+    100%{transform: scale(1);}
+}
+@keyframes glow{
+    0%{text-shadow:0 0 10px rgba(0,255,213,.5);}
+    50%{text-shadow:0 0 20px rgba(0,255,213,1);}
+    100%{text-shadow:0 0 10px rgba(0,255,213,.5);}
+}
+
+/* ===== THEME TOGGLE (tidak pakai neon) ===== */
+.theme-box{
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="hero">
+        <h1>KLM Pro</h1>
+        <p>Jadwal Sholat Khusus Pamekasan & Sekitarnya</p>
+    </div>
+
+    <div class="clock-box">
+        <div id="clock"></div>
+        <div id="date"></div>
+        <div id="countdown">Loading countdown...</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Sholat</th><th>Waktu</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Thulu'</td><td id="FajrTime">--:--</td></tr>
+            <tr><td>Dzuhur</td><td id="DhuhrTime">--:--</td></tr>
+            <tr><td>Asyar</td><td id="AsrTime">--:--</td></tr>
+            <tr><td>Maghrib</td><td id="MaghribTime">--:--</td></tr>
+            <tr><td>Isya'</td><td id="IshaTime">--:--</td></tr>
+            <tr><td>Dhuha</td><td id="DhuhaTime">--:--</td></tr>
+        </tbody>
+    </table>
+
+    <button id="enableNotification">Aktifkan Notifikasi Adzan</button>
+    <button id="testAdzan">Tes Adzan</button>
+</div>
+
+<audio id="adzanAudio"></audio>
+
+<script>
+// ===== THEME MENGIKUTI INDEX.HTML =====
+if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light");
+}
+
+// ===== JAM =====
+const clockEl=document.getElementById("clock");
+const dateEl=document.getElementById("date");
+const countdownEl=document.getElementById("countdown");
+
+function updateClock(){
+    const now=new Date();
+    clockEl.textContent = now.toLocaleTimeString("id-ID",{hour12:false});
+    let dayName = now.toLocaleDateString("id-ID",{ weekday: "long" });
+    if(dayName === "Minggu") dayName = "Ahad";
+    const day = now.getDate();
+    const month = now.toLocaleDateString("id-ID",{ month:"long" });
+    const year = now.getFullYear();
+    dateEl.textContent = `${dayName}, ${day} ${month} ${year}`;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// ===== JADWAL SHOLAT =====
+const city="Pamekasan";
+const country="ID";
+let jadwal={};
+
+function formatTime(date){
+    const h=date.getHours().toString().padStart(2,"0");
+    const m=date.getMinutes().toString().padStart(2,"0");
+    return `${h}:${m}`;
+}
+
+async function fetchJadwalSholat(){
+    const today=new Date();
+    const month=today.getMonth()+1;
+    const year=today.getFullYear();
+    const day=today.getDate();
+    const res=await fetch(`https://api.aladhan.com/v1/calendarByCity?city=${city}&country=${country}&method=2&month=${month}&year=${year}`);
+    const data=await res.json();
+    const todayData=data.data[day-1].timings;
+
+    ["Fajr","Dhuhr","Asr","Maghrib","Isha"].forEach(sholat=>{
+        const t=todayData[sholat].split(" ")[0];
+        document.getElementById(sholat+"Time").textContent=t;
+        jadwal[sholat]=t;
+    });
+
+    const sunrise = todayData.Sunrise.split(" ")[0];
+    const [h,m] = sunrise.split(":");
+    const dhuha = new Date();
+    dhuha.setHours(parseInt(h)+2, parseInt(m),0,0);
+    document.getElementById("DhuhaTime").textContent = formatTime(dhuha);
+    jadwal["Dhuha"] = formatTime(dhuha);
+}
+fetchJadwalSholat();
+
+// ===== ADZAN =====
+const adzanAudio=document.getElementById("adzanAudio");
+const adzanLink="https://raw.githubusercontent.com/mohammadrezaislamic/adzan-sounds/main/adzan.mp3";
+document.getElementById("testAdzan").addEventListener("click",async()=>{
+    if(!adzanAudio.paused){ adzanAudio.pause(); adzanAudio.currentTime=0; }
+    adzanAudio.src=adzanLink;
+    try{await adzanAudio.play();}catch(e){alert("Audio tidak bisa diputar.");}
+});
+
+// ===== NOTIFIKASI =====
+document.getElementById("enableNotification").addEventListener("click",async()=>{
+    if(!("Notification" in window)){ alert("Browser tidak mendukung notifikasi."); return;}
+    const perm = await Notification.requestPermission();
+    if(perm!=="granted") return;
+    setInterval(()=>{
+        const now = new Date();
+        const timeNow = now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+        for(let sholat in jadwal){
+            if(timeNow===jadwal[sholat]){
+                new Notification(`Waktunya sholat ${sholat}`,{
+                    body:`Saatnya melaksanakan sholat ${sholat}`,
+                    icon:"https://raw.githubusercontent.com/mohammadrezaislamic/adzan-sounds/main/adzan-icon.png",
+                    requireInteraction:true
+                });
+                adzanAudio.src=adzanLink;
+                adzanAudio.play();
+            }
+        }
+    },60000);
+});
+
+// ===== COUNTDOWN & HIGHLIGHT =====
+function updateCountdown(){
+    const now=new Date();
+    const times=Object.entries(jadwal).map(([key,value])=>{
+        const [h,m]=value.split(":");
+        const t=new Date();
+        t.setHours(parseInt(h),parseInt(m),0,0);
+        if(t<now) t.setDate(t.getDate()+1);
+        return {sholat:key,date:t};
+    });
+    times.sort((a,b)=>a.date-b.date);
+    const next=times[0];
+    const diff=Math.max(0,next.date-now);
+    const hrs=Math.floor(diff/1000/3600);
+    const mins=Math.floor(diff/1000/60)%60;
+    const secs=Math.floor(diff/1000)%60;
+    countdownEl.textContent=`Sholat ${next.sholat} dalam ${hrs} jam ${mins} menit ${secs} detik`;
+
+    ["FajrTime","DhuhrTime","AsrTime","MaghribTime","IshaTime","DhuhaTime"].forEach(id=>document.getElementById(id).classList.remove("next"));
+    let mapId = {Fajr:"FajrTime",Dhuhr:"DhuhrTime",Asr:"AsrTime",Maghrib:"MaghribTime",Isha:"IshaTime",Dhuha:"DhuhaTime"};
+    document.getElementById(mapId[next.sholat]).classList.add("next");
+}
+setInterval(updateCountdown,1000);
+
+// ===== UPDATE JADWAL HARIAN =====
+setInterval(()=>{ const now=new Date(); if(now.getHours()===0 && now.getMinutes()===0) fetchJadwalSholat(); },60000);
+</script>
+</body>
+</html>

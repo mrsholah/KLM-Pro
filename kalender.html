@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalender Hijriah & Masehi</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Hilangkan scroll halaman utama */
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+h1 {
+    font-size: 32px;
+    margin: 20px 0;
+    text-align: center;
+    color: #00ffd5;
+    text-shadow: 0 0 10px rgba(0,255,213,0.5);
+}
+iframe {
+    width: 95%;
+    max-width: 1000px;
+    height: 90vh; /* Tinggi hampir penuh layar */
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 0 40px rgba(0,255,213,0.4);
+    /* Scroll internal muncul otomatis jika konten tinggi */
+}
+.note {
+    margin-top: 12px;
+    font-size: 16px;
+    color: #c0fdfb;
+    text-align: center;
+}
+a { color: #00ffd5; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>Kalender Hijriah & Masehi</h1>
+
+<!-- Embed kalender dari hijria.netlify.app -->
+<iframe
+    src="https://hijria.netlify.app/"
+    title="Kalender Hijriah & Masehi"
+    allowfullscreen>
+</iframe>
+
+</body>
+</html>
