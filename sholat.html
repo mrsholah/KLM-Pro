@@ -3,189 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KLM – Jadwal Sholat</title>
+<title>KLM Pro – Jadwal Sholat</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f2027">
 
 <style>
-html, body{height:100%;margin:0;padding:0;}
+html,body{
+  margin:0;
+  font-family:Poppins,sans-serif;
+}
+
 body{
-    font-family:Poppins,sans-serif;
-    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:#fff;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    overflow:hidden;
+  min-height:100vh;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  overflow-y:auto;
+  padding:12px 0;
 }
-.main-container{text-align:center;width:100%;overflow:auto;max-height:100vh}
-h1{font-size:3rem;margin:4px 0}
-#clock{font-size:3rem;color:#00ffd5}
+
+.main{
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  padding:12px;
+  max-height:calc(100vh - 24px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+h1{margin:6px 0}
+#clock{font-size:2.8rem;color:#00ffd5;font-weight:700}
+
+#status{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  font-size:.9rem;
+  opacity:.9;
+}
+
+.status-icon{
+  width:20px;
+  height:20px;
+  fill:#00ffd5;
+}
+
 table{
-    width:90%;max-width:400px;margin:auto;
-    border-collapse:collapse;
-    background:rgba(255,255,255,.1);
-    border-radius:12px;overflow:hidden
+  width:100%;
+  margin:10px 0;
+  border-collapse:collapse;
+  background:rgba(255,255,255,.1);
+  border-radius:14px;
+  overflow:hidden;
 }
-th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.2)}
-th{background:rgba(0,255,213,.3)}
-td.next{background:rgba(0,255,213,.2);font-weight:700}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,.15)
+}
+
+th{
+  background:rgba(0,255,213,.25)
+}
+
 button,input{
-    width:70%;max-width:220px;
-    padding:8px;margin:6px;
-    border:none;border-radius:12px;
-    font-weight:700
+  width:80%;
+  padding:10px;
+  margin:6px;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
 }
-button{background:#00ffd5;cursor:pointer}
-input{text-align:center}
+
+button{
+  background:#00ffd5;
+  cursor:pointer;
+}
 
 .alarm-box{
-    margin-top:12px;
-    padding:10px;
-    background:rgba(255,255,255,.1);
-    border-radius:12px;
+  background:rgba(255,255,255,.1);
+  padding:12px;
+  border-radius:14px;
+  margin-top:10px;
 }
-.alarm-item{font-size:.9rem}
+
+.delete-btn{
+  background:#ff4d4d;
+  color:#fff;
+  border-radius:8px;
+  width:36px;
+}
 </style>
 </head>
 
 <body>
-<div class="main-container">
-  <h1>KLM Pro</h1>
-  <p>Jadwal Sholat Pamekasan</p>
+<div class="main">
 
-  <div id="clock"></div>
-  <div id="date"></div>
-  <div id="countdown"></div>
+<h1>KLM Pro</h1>
+<p id="status">
+  <!-- SVG pin lokasi -->
+  <svg class="status-icon" viewBox="0 0 24 24">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+  </svg>
+  <span id="status-text">Mendeteksi lokasi...</span>
+</p>
 
-  <table>
-    <tr><th>Sholat</th><th>Waktu</th></tr>
-    <tr><td>Subuh</td><td id="FajrTime">--:--</td></tr>
-    <tr><td>Dzuhur</td><td id="DhuhrTime">--:--</td></tr>
-    <tr><td>Ashar</td><td id="AsrTime">--:--</td></tr>
-    <tr><td>Maghrib</td><td id="MaghribTime">--:--</td></tr>
-    <tr><td>Isya</td><td id="IshaTime">--:--</td></tr>
-  </table>
+<div id="clock"></div>
+<div id="date"></div>
+<div id="countdown"></div>
 
-  <button id="enableNotification">Aktifkan Notifikasi</button>
-  <button id="testNotification">Tes Notifikasi</button>
+<table>
+<tr><th>Sholat</th><th>Waktu</th></tr>
+<tr><td>Subuh</td><td id="FajrTime">--:--</td></tr>
+<tr><td>Dzuhur</td><td id="DhuhrTime">--:--</td></tr>
+<tr><td>Ashar</td><td id="AsrTime">--:--</td></tr>
+<tr><td>Maghrib</td><td id="MaghribTime">--:--</td></tr>
+<tr><td>Isya</td><td id="IshaTime">--:--</td></tr>
+</table>
 
-  <div class="alarm-box">
-    <h3>⏰ Alarm Custom</h3>
-    <input type="time" id="alarmTime">
-    <button id="addAlarm">Tambah Alarm</button>
-    <div id="alarmList"></div>
-  </div>
+<button id="enableNotif">Aktifkan Notifikasi</button>
+<button id="testNotif">Tes Notifikasi</button>
+
+<div class="alarm-box">
+<h3>⏰ Alarm Custom</h3>
+<input type="time" id="alarmTime">
+<button id="addAlarm">Tambah Alarm</button>
+
+<table>
+<tr><th>No</th><th>Waktu</th><th>Hapus</th></tr>
+<tbody id="alarmList"></tbody>
+</table>
+</div>
+
 </div>
 
 <script>
-// ===== SERVICE WORKER =====
-if ("serviceWorker" in navigator) {
+// ================= SERVICE WORKER =================
+if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js");
 }
 
-// ===== JAM =====
-const clockEl=document.getElementById("clock");
-const dateEl=document.getElementById("date");
-const countdownEl=document.getElementById("countdown");
-
-function updateClock(){
+// ================= JAM =================
+setInterval(()=>{
   const n=new Date();
-  clockEl.textContent=n.toLocaleTimeString("id-ID",{hour12:false});
-  dateEl.textContent=n.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-}
-updateClock();
-setInterval(updateClock,1000);
+  clock.textContent=n.toLocaleTimeString("id-ID",{hour12:false});
+  date.textContent=n.toLocaleDateString("id-ID",{
+    weekday:"long",day:"numeric",month:"long",year:"numeric"
+  });
+},1000);
 
-// ===== JADWAL SHOLAT =====
-const city="Pamekasan", country="ID";
+// ================= GLOBAL =================
 let jadwal={}, notifDone={};
+const statusText=document.getElementById("status-text");
 
-async function fetchJadwal(){
+// ================= REVERSE GEOCODING =================
+async function getNamaLokasi(lat,lon){
+  const url=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+  const res=await fetch(url,{headers:{'User-Agent':'KLM-Pro'}});
+  const a=(await res.json()).address;
+
+  const kecamatan=a.subdistrict||a.district||"";
+  const kabupaten=a.city||a.town||a.county||"";
+  const provinsi=a.state||"";
+
+  return [kecamatan,kabupaten,provinsi].filter(Boolean).join(", ");
+}
+
+// ================= JADWAL SHOLAT =================
+async function fetchJadwal(lat,lon){
+  statusText.textContent="Memuat jadwal sholat...";
   const d=new Date();
-  const res=await fetch(
-    `https://api.aladhan.com/v1/calendarByCity?city=${city}&country=${country}&method=2&month=${d.getMonth()+1}&year=${d.getFullYear()}`
-  );
-  const t=(await res.json()).data[d.getDate()-1].timings;
+
+  const url=`https://api.aladhan.com/v1/timings/${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}?latitude=${lat}&longitude=${lon}&method=11&timezonestring=Asia/Jakarta`;
+  const res=await fetch(url);
+  const t=(await res.json()).data.timings;
 
   ["Fajr","Dhuhr","Asr","Maghrib","Isha"].forEach(s=>{
-    jadwal[s]=t[s].split(" ")[0];
+    jadwal[s]=t[s].slice(0,5);
     document.getElementById(s+"Time").textContent=jadwal[s];
   });
 
   notifDone={};
+  statusText.textContent=await getNamaLokasi(lat,lon);
 }
-fetchJadwal();
 
-// ===== NOTIF SHOLAT =====
-enableNotification.onclick=async()=>{
-  const izin=await Notification.requestPermission();
-  if(izin!=="granted") return;
+// ================= LOKASI (AUTO) =================
+function getLocation(){
+  if(!navigator.geolocation){
+    statusText.textContent="❌ GPS tidak didukung";
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos=>fetchJadwal(pos.coords.latitude,pos.coords.longitude),
+    ()=>statusText.textContent="❌ Izin lokasi ditolak",
+    {enableHighAccuracy:true,maximumAge:60000,timeout:15000}
+  );
+}
+
+// LOAD AWAL + AUTO UPDATE
+getLocation();
+setInterval(getLocation,15*60*1000);
+
+// ================= NOTIF SHOLAT =================
+enableNotif.onclick=async()=>{
+  if(await Notification.requestPermission()!=="granted")return;
 
   setInterval(async()=>{
     const now=new Date().toTimeString().slice(0,5);
     for(const s in jadwal){
-      if(now===jadwal[s] && !notifDone[s]){
+      if(now===jadwal[s]&&!notifDone[s]){
         const reg=await navigator.serviceWorker.ready;
-        reg.showNotification("🕌 Pengingat Sholat",{
-          body:`Sekarang masuk waktu sholat ${s}`,
+        reg.showNotification("🕌 Waktu Sholat",{
+          body:`Sekarang masuk waktu ${s}`,
           requireInteraction:true,
           tag:"sholat-"+s
         });
+        navigator.vibrate?.(5000);
         notifDone[s]=true;
       }
     }
   },30000);
 };
 
-// ===== TES NOTIF =====
-testNotification.onclick=async()=>{
+// ================= TES NOTIF =================
+testNotif.onclick=async()=>{
   const reg=await navigator.serviceWorker.ready;
-  reg.showNotification("🔔 Tes Notifikasi",{
-    body:"Notifikasi berhasil muncul",
-    requireInteraction:true
-  });
+  reg.showNotification("🔔 Tes Notifikasi",{body:"Notifikasi aktif"});
 };
 
-// ===== COUNTDOWN =====
+// ================= COUNTDOWN =================
 setInterval(()=>{
-  if(!Object.keys(jadwal).length) return;
+  if(!Object.keys(jadwal).length)return;
   const now=new Date();
 
   const list=Object.entries(jadwal).map(([k,v])=>{
     const [h,m]=v.split(":").map(Number);
-    const t=new Date();
-    t.setHours(h,m,0,0);
-    if(t<=now) t.setDate(t.getDate()+1);
-    return {k,t};
+    const t=new Date();t.setHours(h,m,0,0);
+    if(t<=now)t.setDate(t.getDate()+1);
+    return{k,t};
   }).sort((a,b)=>a.t-b.t);
 
-  const diff=list[0].t-now;
-  const jam=Math.floor(diff/3600000);
-  const menit=Math.floor(diff/60000)%60;
-  countdownEl.textContent=`${list[0].k} dalam ${jam} jam ${menit} menit`;
+  const d=list[0].t-now;
+  countdown.textContent=
+    `${list[0].k} dalam ${Math.floor(d/3600000)} jam ${Math.floor(d/60000)%60} menit`;
 },1000);
 
-// ===== ALARM CUSTOM =====
+// ================= ALARM CUSTOM =================
 let alarms=JSON.parse(localStorage.getItem("alarms")||"[]");
 const alarmList=document.getElementById("alarmList");
 
 function renderAlarms(){
   alarmList.innerHTML="";
-  alarms.forEach(a=>{
-    const d=document.createElement("div");
-    d.className="alarm-item";
-    d.textContent="⏰ "+a;
-    alarmList.appendChild(d);
+  alarms.forEach((a,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${i+1}</td><td>${a}</td>
+      <td><button class="delete-btn">X</button></td>`;
+    tr.querySelector("button").onclick=()=>{
+      alarms.splice(i,1);
+      localStorage.setItem("alarms",JSON.stringify(alarms));
+      renderAlarms();
+    };
+    alarmList.appendChild(tr);
   });
 }
 renderAlarms();
 
 addAlarm.onclick=()=>{
-  if(!alarmTime.value) return;
+  if(!alarmTime.value)return;
   alarms.push(alarmTime.value);
   localStorage.setItem("alarms",JSON.stringify(alarms));
   renderAlarms();
@@ -197,11 +287,8 @@ setInterval(async()=>{
   for(let i=alarms.length-1;i>=0;i--){
     if(now===alarms[i]){
       const reg=await navigator.serviceWorker.ready;
-      reg.showNotification("⏰ Alarm Custom",{
-        body:`Alarm pukul ${alarms[i]}`,
-        requireInteraction:true,
-        tag:"alarm-"+alarms[i]
-      });
+      reg.showNotification("⏰ Alarm Custom",{body:`Alarm pukul ${alarms[i]}`});
+      navigator.vibrate?.(3000);
       alarms.splice(i,1);
       localStorage.setItem("alarms",JSON.stringify(alarms));
       renderAlarms();
